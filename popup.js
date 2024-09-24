@@ -1,65 +1,37 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const actionButtons = document.getElementById('actionButtons');
-    const bypassButton = document.getElementById('bypassButton');
-    const archiveButton = document.getElementById('archiveButton');
-    const viewArchivesButton = document.getElementById('viewArchivesButton');
-
-    chrome.storage.local.get(['userId'], function (result) {
-        if (!result.userId) {
-            const userId = generateUserId();
-            chrome.storage.local.set({ userId: userId }, function () {
-                console.log('User ID generated and saved');
-            });
-        }
-        actionButtons.style.display = 'block';
-    });
-
-    bypassButton.addEventListener('click', async () => {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-        chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            function: bypassPaywall,
-        });
-    });
-
-    archiveButton.addEventListener('click', async () => {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-        chrome.storage.local.get(['userId'], async function (result) {
-            const response = await fetch('http://localhost:5000/archive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-ID': result.userId,
-                },
-                body: JSON.stringify({ url: tab.url }),
-            });
-
-            if (response.ok) {
-                alert('Page archived successfully!');
-            } else {
-                alert('Failed to archive page. Please try again.');
-            }
-        });
-    });
-
-    viewArchivesButton.addEventListener('click', () => {
-        chrome.storage.local.get(['userId'], function (result) {
-            chrome.tabs.create({ url: `http://localhost:5000/my-archives/${result.userId}` });
-        });
-    });
+document.getElementById('archiveBtn').addEventListener('click', function() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    let url = tabs[0].url;
+    let archiveUrl = 'https://archive.is/?run=1&url=' + encodeURIComponent(url);
+    chrome.tabs.create({ url: archiveUrl });
+  });
 });
 
-function bypassPaywall() {
-    const url = window.location.href;
-    const bypassUrl = `http://35.209.74.136:9023/${url}`;
-    window.location.href = bypassUrl;
-}
-
-function generateUserId() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
+document.getElementById('save-mhtml').addEventListener('click', function () {
+  console.log('Save MHTML button clicked');
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    console.log('Active tab:', tabs[0]);
+    chrome.pageCapture.saveAsMHTML({ tabId: tabs[0].id }, function (mhtmlData) {
+      if (chrome.runtime.lastError) {
+        console.error('Error saving MHTML:', chrome.runtime.lastError);
+        alert('Error saving MHTML: ' + chrome.runtime.lastError.message);
+        return;
+      }
+      console.log('MHTML data received');
+      let url = URL.createObjectURL(mhtmlData);
+      let filename = tabs[0].title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.mhtml';
+      console.log('Initiating download:', filename);
+      chrome.downloads.download({
+        url: url,
+        filename: filename,
+        saveAs: true
+      }, function(downloadId) {
+        if (chrome.runtime.lastError) {
+          console.error('Error initiating download:', chrome.runtime.lastError);
+          alert('Error initiating download: ' + chrome.runtime.lastError.message);
+        } else {
+          console.log('Download started with ID:', downloadId);
+        }
+      });
     });
-}
+  });
+});
