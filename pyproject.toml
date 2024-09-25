@@ -24,6 +24,8 @@ langchain = "^0.2.0"
 langchain-community = "^0.2.0"
 sqlalchemy-utils = "^0.41.2"
 pydantic-settings = "^2.5.2"
+psycopg = "^3.2.2"
+python-multipart = "^0.0.10"
 
 [build-system]
 requires = ["poetry-core"]

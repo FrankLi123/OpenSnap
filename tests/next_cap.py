@@ -8,8 +8,9 @@ resources = {}
 
 
 async def handle_response(response):
+    print(f'请求成功 {response.url=}')
+
     if response and response.ok:
-        print(f'请求成功 {response.url=}')
         content_type = response.headers.get('content-type')
         if content_type == None:
             return
@@ -22,8 +23,7 @@ async def handle_response(response):
                 'content_type': content_type,
                 'data': data
             }
-
-        if 'text/css' in content_type:
+        elif 'text/css' in content_type:
             print('资源类型为css')
             url = response.url
             data = await response.text()
@@ -31,6 +31,9 @@ async def handle_response(response):
                 'content_type': content_type,
                 'data': data
             }
+        else:
+            print('资源类型'+content_type)
+
 
 
 def resources_contains(part_of_url: str) -> str | None:
@@ -203,7 +206,7 @@ async def page_snap(page: Page) -> str:
 async def save_as_single_file(url, output_filename):
     """Save the page as a single file."""
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
+        browser = await p.chromium.launch(headless=False,devtools=True)
         page = await browser.new_page()
 
         # Step1: Hook page to intercept requests and save resources
@@ -215,6 +218,7 @@ async def save_as_single_file(url, output_filename):
         # It's better to wait for the page to be fully loaded
         await page.wait_for_load_state("networkidle")
 
+        input()
         # Step2: Get the page content
         embedded_html = await page_snap(page)
 

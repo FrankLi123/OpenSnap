@@ -13,12 +13,6 @@ def get_db():
     finally:
         db.close()
 
-
-@router.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
 @router.get("/search/{keyword}")
 async def search(keyword: str):
     return {"keyword": keyword}
@@ -56,3 +50,10 @@ async def upload(
         print(f"Error uploading file: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.get("/content/{id}")
+async def get_content(id: int, db: Session = Depends(get_db)):
+    content = db.query(MHTMLContent).filter(MHTMLContent.id == id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="Content not found")
+    return {"content": content.content}
