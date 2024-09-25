@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from loguru import logger
 from starlette.types import Message
 
-from saveit.router import webpage
+from saveit.router import snapshot
 
 app = FastAPI()
 
@@ -38,7 +38,7 @@ async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
 
-app.include_router(router=webpage.router, prefix="/webpage", tags=["webpage"])
+app.include_router(router=snapshot.router, prefix="/snapshot", tags=["snapshot"])
 
 @app.on_event("startup")
 async def startup_event():
