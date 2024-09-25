@@ -40,7 +40,7 @@ document.getElementById('save-mhtml').addEventListener('click', function () {
       formData.append('identifier', 'user123'); // Replace with actual user identifier
 
       // Send the MHTML data to your backend
-      fetch('http://localhost:9000/upload/', {
+      fetch('http://localhost:9000/webpage/upload/', {
         method: 'POST',
         body: formData
       })
