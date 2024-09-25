@@ -25,5 +25,6 @@ class MHTMLContent(Base):
     __tablename__ = "mhtml_contents"
 
     id = Column(Integer, primary_key=True, index=True)
+    identifier = Column(String, index=True)
     filename = Column(String, index=True)
     content = Column(Text)
