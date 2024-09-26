@@ -6,7 +6,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "action": {
-    "default_popup": "options/popup.html"
+    "default_popup": "popup.html"
   },
   "description": "Bypass Paywalls & Archive Webpages",
   "manifest_version": 3,
@@ -33,7 +33,7 @@
         "<all_urls>"
       ],
       "js": [
-        "content.js"
+        "content-scripts/content.js"
       ]
     }
   ]
