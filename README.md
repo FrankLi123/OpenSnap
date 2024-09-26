@@ -1,8 +1,3 @@
-# sAveIt - Paywall Bypasser & Archiver Chrome Extension
+# WXT + React
 
-This Chrome extension allows you to bypass paywalls and archive web pages.
-
-## Features
-
-- Bypass paywalls on some domain
-- Archive current page content: save current page content as a .mhtml file
+This template should help get you started developing with React in WXT.
