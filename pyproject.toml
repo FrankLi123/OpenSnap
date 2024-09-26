@@ -6,7 +6,7 @@ authors = ["Thomas <wxy_000000@qq.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 pywebcopy = "^7.0.2"
 lxml-html-clean = "^0.2.2"
 playwright = "^1.47.0"
