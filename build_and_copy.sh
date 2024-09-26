@@ -15,7 +15,7 @@ fi
 
 # Define source and destination directories
 SOURCE_DIR=".output/chrome-mv3"
-DEST_DIR="saveit"
+DEST_DIR="opensnap"
 
 # Create the destination directory if it doesn't exist
 mkdir -p "$DEST_DIR"
