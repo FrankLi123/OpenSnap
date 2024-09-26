@@ -1,4 +1,7 @@
 #!/bin/bash
+# Run pnpm build
+echo "Running pnpm init"
+pnpm i
 
 # Run pnpm build
 echo "Running pnpm build..."
@@ -21,7 +24,6 @@ mkdir -p "$DEST_DIR"
 echo "Copying files and folders..."
 cp -R "$SOURCE_DIR/assets" "$DEST_DIR/"
 cp -R "$SOURCE_DIR/chunks" "$DEST_DIR/"
-cp -R "$SOURCE_DIR/content-scripts" "$DEST_DIR/"
 cp "$SOURCE_DIR/popup.html" "$DEST_DIR/"
 
 echo "Build and copy process completed successfully."

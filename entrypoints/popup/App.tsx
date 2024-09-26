@@ -32,13 +32,20 @@ function App() {
     if (!data || !data.id) return;
 
     setIsSaving(true);
-    chrome.pageCapture.saveAsMHTML({ tabId: data.id }, async (blob) => {
+    chrome.tabs.sendMessage(data.id, { action: "saveMHTML" }, async (response) => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError);
         setIsSaving(false);
         return;
       }
-      if (!blob) return;
+
+      if (!response || response.error) {
+        console.error("Failed to get MHTML data:", response?.error);
+        setIsSaving(false);
+        return;
+      }
+
+      const blob = new Blob([response.mhtmlData], { type: "application/x-mimearchive" });
 
       const uid = address ?? "0x0000000000000000000000000000000000000000";
       const url = data.url ?? "";
@@ -48,15 +55,13 @@ function App() {
       body.append("file", blob, "snapshot.mhtml");
 
       try {
-        // 上传到服务器
         await fetch("http://35.209.74.136:9000/snapshot/upload", {
           method: "POST",
           body: body,
         });
 
-        // 下载到本地
-        const fileName = `${data.title || 'snapshot'}.mhtml`;
-        saveAs(blob, fileName);
+        //const fileName = `${data.title || 'snapshot'}.mhtml`;
+        //saveAs(blob, fileName);
 
         setIsSaving(false);
       } catch (error) {
@@ -65,6 +70,7 @@ function App() {
       }
     });
   }, [data, address]);
+
 
   // todo: add the landing page of the blank page
 
