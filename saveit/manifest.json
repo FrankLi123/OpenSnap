@@ -8,11 +8,10 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "description": "Bypass Paywalls & Archive Webpages",
+  "description": "Webpages Snapshot",
   "manifest_version": 3,
   "minimum_chrome_version": "102",
-  "name": "sAveIt - Paywall Bypasser & Archiver - v3",
-  "short_name": "sAveIt",
+  "name": "OpenSnap",
   "incognito": "split",
   "permissions": [
     "cookies",
