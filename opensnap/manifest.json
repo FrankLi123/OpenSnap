@@ -1,0 +1,42 @@
+{
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "description": "Webpages Snapshot",
+  "manifest_version": 3,
+  "minimum_chrome_version": "102",
+  "name": "OpenSnap",
+  "incognito": "split",
+  "permissions": [
+    "cookies",
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "storage",
+    "activeTab",
+    "pageCapture",
+    "downloads"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "version": "0.0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
+}
