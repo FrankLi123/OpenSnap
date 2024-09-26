@@ -17,6 +17,10 @@ from ..db.database import DBSession
 
 from email import message_from_bytes
 from email.policy import default
+import email
+from email import policy
+from email.parser import BytesParser
+import os
 
 # Load environment variables from .env file
 load_dotenv()
@@ -116,6 +120,50 @@ async def upload(
     }
 
 
+def mhtml_to_html(mhtml_content):
+    # 解析MHTML内容
+    msg = BytesParser(policy=policy.default).parsebytes(mhtml_content)
+
+    # 初始化HTML和CSS内容
+    html_contents = []
+    css_content = ''
+
+    # 遍历各部分
+    for part in msg.walk():
+        content_type = part.get_content_type()
+        charset = part.get_content_charset() or 'utf-8'
+
+        if content_type == 'text/html':
+            try:
+                html_content = part.get_payload(decode=True).decode(charset)
+                html_contents.append(html_content)
+            except (UnicodeDecodeError, LookupError) as e:
+                print(f"Failed to decode HTML with charset {charset}: {e}")
+
+        elif content_type == 'text/css':
+            try:
+                css_content += part.get_payload(decode=True).decode(charset) + '\n'
+            except (UnicodeDecodeError, LookupError) as e:
+                print(f"Failed to decode CSS with charset {charset}: {e}")
+
+    if not html_contents:
+        raise ValueError("No HTML content found in the MHTML file")
+
+    # 合并HTML内容
+    combined_html = ''
+    for html in html_contents:
+        # 在每个HTML的<head>部分插入CSS
+        if css_content:
+            css_tag = f'<style>\n{css_content}</style>'
+            if '<head>' in html:
+                html = html.replace('<head>', f'<head>\n{css_tag}', 1)
+            else:
+                html = css_tag + html
+        combined_html += html
+
+    return combined_html
+
+
 @router.get("/display/{snapshot_id}", response_class=HTMLResponse)
 async def display_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
     snapshot = db.query(Snapshot).filter(Snapshot.id == snapshot_id).first()
@@ -124,22 +172,7 @@ async def display_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
 
     try:
         mhtml_content = await fetch_from_ipfs(snapshot.ipfs_hash)
-
-        # Ensure mhtml_content is bytes
-        if isinstance(mhtml_content, str):
-            mhtml_content = mhtml_content.encode('utf-8')
-
-        # Parse the MHTML content
-        msg = message_from_bytes(mhtml_content, policy=default)
-
-        # Extract the HTML content
-        for part in msg.walk():
-            if part.get_content_type() == "text/html":
-                html_content = part.get_payload(decode=True)
-                # Ensure html_content is str
-                if isinstance(html_content, bytes):
-                    html_content = html_content.decode(part.get_content_charset() or 'utf-8')
-                return HTMLResponse(content=html_content)
+        return HTMLResponse(content=mhtml_to_html(mhtml_content))
 
         raise HTTPException(status_code=500, detail="No HTML content found in MHTML file")
     except Exception as e:
