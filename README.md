@@ -23,7 +23,7 @@ To load the extension into your browser:
 1. Open your browser's extension management page.
 2. Enable "Developer mode".
 3. Click "Load unpacked" (or similar option).
-4. Select the `open` directory from your project.
+4. Select the `opensnap` directory from your project.
 
 The OpenSnap extension should now be loaded and active in your browser.
 
