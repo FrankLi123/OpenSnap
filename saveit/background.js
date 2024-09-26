@@ -1464,16 +1464,16 @@ function updateBadge(activeTab) {
     let currentUrl = activeTab.url;
     if (currentUrl) {
         if (isSiteEnabled({ url: currentUrl })) {
-            badgeText = 'ON';
+            badgeText = ''; //'ON'
             color = 'red';
         } else if (matchUrlDomain(enabledSites, currentUrl)) {
-            badgeText = 'ON-';
+            badgeText = ''; //'ON-'
             color = 'orange';
         } else if (matchUrlDomain(disabledSites, currentUrl)) {
-            badgeText = 'OFF';
+            badgeText = ''; //'OFF'
             color = 'blue';
         } else if (matchUrlDomain(nofix_sites, currentUrl)) {
-            badgeText = 'X';
+            badgeText = ''; //'X'
             color = 'silver';
         }
         if (matchUrlDomain('webcache.googleusercontent.com', currentUrl))
