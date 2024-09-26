@@ -28,17 +28,22 @@ async def get_body(request: Request):
 @app.middleware("http")
 async def error_handling(request: Request, call_next):
     body = await get_body(request)
-    logger.info(f"Request: {request.url} {request.method} {body}")
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        logger.error(f"Request: {request.url} {request.method} {body}")
+        logger.exception(e)
+        response = {"error": str(e)}
     return response
 
 
-@app.get("/")
+@app.get("/",include_in_schema=False)
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
 
 app.include_router(router=snapshot.router, prefix="/snapshot", tags=["snapshot"])
+
 
 @app.on_event("startup")
 async def startup_event():

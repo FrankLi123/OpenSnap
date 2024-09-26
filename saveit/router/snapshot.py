@@ -145,26 +145,39 @@ async def display_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to display MHTML content: {str(e)}")
 
-@router.get("/list_snapshots/", response_model=List[dict])
+@router.get("/list_snapshots/{uid}", response_model=List[dict])
 async def list_snapshots(
         uid: str,
-        skip: int = 0,
+        offset: int = 0,
         limit: int = 100,
         db: Session = Depends(get_db)
 ):
-    snapshots = db.query(Snapshot).filter(Snapshot.uid == uid).order_by(desc(Snapshot.created_at)).offset(skip).limit(
+    snapshots = db.query(Snapshot).filter(Snapshot.uid == uid).order_by(desc(Snapshot.created_at)).offset(offset).limit(
         limit).all()
     return [
         {
             "id": snapshot.id,
             "uid": snapshot.uid,
             "url": snapshot.url,
+            "ipfs_hash": snapshot.ipfs_hash,
             "file_name": snapshot.file_name,
             "created_at": snapshot.created_at
         } for snapshot in snapshots
     ]
 
 
-@router.get("/search/{keyword}")
-async def search(keyword: str):
-    return {"keyword": keyword}
+@router.get("/latest_snapshots/")
+async def latest_snapshot(
+        db: Session = Depends(get_db)
+):
+    snapshots = db.query(Snapshot).order_by(desc(Snapshot.created_at)).all()
+    return [
+        {
+            "id": snapshot.id,
+            "uid": snapshot.uid,
+            "url": snapshot.url,
+            "ipfs_hash": snapshot.ipfs_hash,
+            "file_name": snapshot.file_name,
+            "created_at": snapshot.created_at
+        } for snapshot in snapshots
+    ]
