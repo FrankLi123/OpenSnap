@@ -25,7 +25,7 @@
   "host_permissions": [
     "<all_urls>"
   ],
-  "version": "1.0.1",
+  "version": "0.0.1",
   "content_scripts": [
     {
       "matches": [
@@ -35,5 +35,8 @@
         "content.js"
       ]
     }
-  ]
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
 }
