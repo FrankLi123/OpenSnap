@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "saveit"
+version = "0.1.0"
+description = ""
+authors = ["Thomas <wxy_000000@qq.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pywebcopy = "^7.0.2"
+lxml-html-clean = "^0.2.2"
+playwright = "^1.47.0"
+aiofiles = "^24.1.0"
+bs4 = "^0.0.2"
+fastapi = "^0.103.0"
+uvicorn = { extras = ["standard"], version = "^0.23.2" }
+loguru = "^0.7.2"
+
+sqlalchemy = "^2.0.31"
+psycopg2-binary = "^2.9.9"
+pytest-asyncio = "^0.23.7"
+langchain-openai = "^0.1.14"
+langchain = "^0.2.0"
+langchain-community = "^0.2.0"
+sqlalchemy-utils = "^0.41.2"
+pydantic-settings = "^2.5.2"
+psycopg = "^3.2.2"
+python-multipart = "^0.0.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
