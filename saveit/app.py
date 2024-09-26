@@ -4,8 +4,17 @@ from loguru import logger
 from starlette.types import Message
 
 from saveit.router import snapshot
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 async def set_body(request: Request, body: bytes):
@@ -37,7 +46,7 @@ async def error_handling(request: Request, call_next):
     return response
 
 
-@app.get("/",include_in_schema=False)
+@app.get("/", include_in_schema=False)
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
