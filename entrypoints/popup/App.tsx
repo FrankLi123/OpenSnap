@@ -15,6 +15,9 @@ function App() {
   const [enabled, setEnabled] = useState(true);
   const [data, setData] = useState<chrome.tabs.Tab | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [displayUrl, setDisplayUrl] = useState<string | null>(null);
+  const [ipfsHash, setIpfsHash] = useState<string | null>(null);
 
   useEffect(() => {
     chrome.tabs.query(
@@ -32,16 +35,24 @@ function App() {
     if (!data || !data.id) return;
 
     setIsSaving(true);
+    setSaveStatus(null);
+    setDisplayUrl(null);
+    setIpfsHash(null);
+
     chrome.tabs.sendMessage(data.id, { action: "saveMHTML" }, async (response) => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError);
         setIsSaving(false);
+        setSaveStatus("Error: " + chrome.runtime.lastError.message);
+        setTimeout(() => setSaveStatus(null), 5000);
         return;
       }
 
       if (!response || response.error) {
         console.error("Failed to get MHTML data:", response?.error);
         setIsSaving(false);
+        setSaveStatus("Error: Failed to get MHTML data");
+        setTimeout(() => setSaveStatus(null), 5000);
         return;
       }
 
@@ -55,22 +66,35 @@ function App() {
       body.append("file", blob, "snapshot.mhtml");
 
       try {
-        await fetch("http://35.209.74.136:9000/snapshot/upload", {
+        const result = await fetch("http://35.209.74.136:9000/snapshot/upload", {
           method: "POST",
           body: body,
         });
 
-        //const fileName = `${data.title || 'snapshot'}.mhtml`;
-        //saveAs(blob, fileName);
+        const jsonResult = await result.json();
+
+        if (result.ok) {
+          setSaveStatus("Success");
+          setDisplayUrl(jsonResult.display_url.replace("localhost", "35.209.74.136"));
+          setIpfsHash(jsonResult.ipfs_hash);
+        } else {
+          setSaveStatus("Error: " + jsonResult.message);
+        }
 
         setIsSaving(false);
+        setTimeout(() => {
+          setSaveStatus(null);
+          setDisplayUrl(null);
+          setIpfsHash(null);
+        }, 5000);
       } catch (error) {
         console.error(error);
         setIsSaving(false);
+        setSaveStatus("Error: " + (error instanceof Error ? error.message : String(error)));
+        setTimeout(() => setSaveStatus(null), 5000);
       }
     });
   }, [data, address]);
-
 
   // todo: add the landing page of the blank page
 
@@ -124,6 +148,15 @@ function App() {
               {isSaving ? "Saving..." : "Save"}
             </Button>
           </div>
+          {saveStatus && (
+            <div className="w-full text-sm">
+              <p>Status: {saveStatus}</p>
+              {displayUrl && (
+                <p>Display URL: <a href={displayUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{displayUrl}</a></p>
+              )}
+              {ipfsHash && <p>IPFS Hash: {ipfsHash}</p>}
+            </div>
+          )}
         </div>
         <Separator />
         {isConnected ? (
