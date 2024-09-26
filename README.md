@@ -1,1 +1,1 @@
-# HackathonProject
+# OpenSnap
